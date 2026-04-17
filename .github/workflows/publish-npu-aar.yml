@@ -1,0 +1,129 @@
+name: Publish NPU AAR to GitHub Packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Artifact version (e.g. 0.10.35-ethos-n78.1)'
+        required: true
+        default: '0.10.35-ethos-n78.1'
+  push:
+    tags:
+      - 'npu-v*'   # e.g. git tag npu-v0.10.35-ethos-n78.1 && git push myfork --tags
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
+      - uses: actions/checkout@v4
+
+      # ── 2. JDK (for mvn deploy) ───────────────────────────────────────────────
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # ── 3. Maven settings.xml with GitHub Packages credentials ────────────────
+      - name: Write Maven settings.xml
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<EOF
+          <settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${GITHUB_ACTOR}</username>
+                <password>${{ secrets.GITHUB_TOKEN }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
+      # ── 4. Android SDK + NDK ──────────────────────────────────────────────────
+      - uses: android-actions/setup-android@v3
+
+      - name: Install NDK 27 and platform tools
+        run: |
+          sdkmanager --install \
+            "ndk;27.0.12077973" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
+
+      # ── 5. Bazelisk ───────────────────────────────────────────────────────────
+      - name: Install Bazelisk
+        run: |
+          curl -fsSL \
+            https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64 \
+            -o /usr/local/bin/bazelisk
+          chmod +x /usr/local/bin/bazelisk
+
+      # ── 6. Download Arm NN prebuilt libs ──────────────────────────────────────
+      # Before running this workflow, create a GitHub Release tagged "armnn-libs"
+      # in this repo and upload "armnn-libs-arm64-v8a.tar.gz" as a release asset.
+      # The tarball root should contain:
+      #   libarmnn.so.35.0  libarmnn.so.35
+      #   libarmnnDelegate.so.29.1  libarmnnDelegate.so.29
+      #   libEthosNSupport.so  libEthosNDriver.so
+      - name: Download Arm NN prebuilt libraries
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download armnn-libs \
+            --pattern "armnn-libs-arm64-v8a.tar.gz" \
+            --repo ${{ github.repository }}
+          mkdir -p third_party/armnn/lib/arm64-v8a
+          tar -xzf armnn-libs-arm64-v8a.tar.gz -C third_party/armnn/lib/arm64-v8a
+          ls -lh third_party/armnn/lib/arm64-v8a/
+
+      # ── 7. Build AARs ─────────────────────────────────────────────────────────
+      - name: Build AAR artifacts with Bazel
+        run: |
+          bazelisk build -c opt \
+            --config=android_arm64 \
+            --define=arm_npu=1 \
+            --define=xnn_enable_avx512amx=false \
+            //mediapipe/tasks/java/com/google/mediapipe/tasks/core:tasks_core \
+            //mediapipe/tasks/java/com/google/mediapipe/tasks/vision:tasks_vision
+
+      # ── 8. Resolve publish version ────────────────────────────────────────────
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            VER="${GITHUB_REF_NAME#npu-v}"
+          else
+            VER="${{ github.event.inputs.version }}"
+          fi
+          echo "value=$VER" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VER"
+
+      # ── 9. Publish tasks-core-npu ─────────────────────────────────────────────
+      - name: Publish tasks-core-npu
+        run: |
+          mvn deploy:deploy-file \
+            -Dfile=bazel-bin/mediapipe/tasks/java/com/google/mediapipe/tasks/core/tasks_core.aar \
+            -DgroupId=io.github.hieunc278.mediapipe \
+            -DartifactId=tasks-core-npu \
+            -Dversion=${{ steps.version.outputs.value }} \
+            -Dpackaging=aar \
+            -DgeneratePom=true \
+            -DrepositoryId=github \
+            -Durl=https://maven.pkg.github.com/hieunc278/mediapipe
+
+      # ── 10. Publish tasks-vision-npu ──────────────────────────────────────────
+      - name: Publish tasks-vision-npu
+        run: |
+          mvn deploy:deploy-file \
+            -Dfile=bazel-bin/mediapipe/tasks/java/com/google/mediapipe/tasks/vision/tasks_vision.aar \
+            -DgroupId=io.github.hieunc278.mediapipe \
+            -DartifactId=tasks-vision-npu \
+            -Dversion=${{ steps.version.outputs.value }} \
+            -Dpackaging=aar \
+            -DgeneratePom=true \
+            -DrepositoryId=github \
+            -Durl=https://maven.pkg.github.com/hieunc278/mediapipe
