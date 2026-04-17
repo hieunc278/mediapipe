@@ -168,11 +168,20 @@ message InferenceCalculatorOptions {
       optional bool slow_consistent_arithmetic = 8;
     }
 
+    // Arm NN delegate backed by the Arm Ethos-N NPU (EthosNAcc backend).
+    // Falls back to CpuRef for unsupported ops.
+    message Npu {
+      // Optional directory that will be searched for Arm NN dynamic backends
+      // (*.so). Leave empty to use only statically-linked backends.
+      optional string dispatch_library_directory = 1;
+    }
+
     oneof delegate {
       TfLite tflite = 1;
       Gpu gpu = 2;
       Nnapi nnapi = 3;
       Xnnpack xnnpack = 4;
+      Npu npu = 5;
     }
   }
 

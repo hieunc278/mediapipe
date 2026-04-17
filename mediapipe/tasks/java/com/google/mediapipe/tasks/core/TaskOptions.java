@@ -90,6 +90,18 @@ public abstract class TaskOptions {
                         accelerationBuilder,
                         (BaseOptions.DelegateOptions.GpuOptions) delegateOptions));
         break;
+      case NPU:
+        accelerationBuilder.setNpu(
+            InferenceCalculatorProto.InferenceCalculatorOptions.Delegate.Npu
+                .getDefaultInstance());
+        options
+            .delegateOptions()
+            .ifPresent(
+                delegateOptions ->
+                    setDelegateOptions(
+                        accelerationBuilder,
+                        (BaseOptions.DelegateOptions.NpuOptions) delegateOptions));
+        break;
     }
 
     return BaseOptionsProto.BaseOptions.newBuilder()
@@ -115,5 +127,18 @@ public abstract class TaskOptions {
     options.serializedModelDir().ifPresent(gpuBuilder::setSerializedModelDir);
     options.modelToken().ifPresent(gpuBuilder::setModelToken);
     accelerationBuilder.setGpu(gpuBuilder.build());
+  }
+
+  private void setDelegateOptions(
+      AccelerationProto.Acceleration.Builder accelerationBuilder,
+      BaseOptions.DelegateOptions.NpuOptions options) {
+    InferenceCalculatorProto.InferenceCalculatorOptions.Delegate.Npu.Builder npuBuilder =
+        InferenceCalculatorProto.InferenceCalculatorOptions.Delegate.Npu.newBuilder();
+    // dispatch_library_directory is optional; only set when explicitly provided.
+    String dispatchDir = options.dispatchLibraryDirectory();
+    if (dispatchDir != null && !dispatchDir.isEmpty()) {
+      npuBuilder.setDispatchLibraryDirectory(dispatchDir);
+    }
+    accelerationBuilder.setNpu(npuBuilder.build());
   }
 }

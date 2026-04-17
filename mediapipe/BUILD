@@ -209,3 +209,11 @@ exports_files(
     ["provisioning_profile.mobileprovision"],
     visibility = ["//visibility:public"],
 )
+
+# --define=arm_npu=1  enables the Arm NN / Ethos-N78 NPU delegate in
+# inference_calculator_cpu. Use together with --config=android_arm64.
+config_setting(
+    name = "arm_npu",
+    define_values = {"arm_npu": "1"},
+    visibility = ["//visibility:public"],
+)

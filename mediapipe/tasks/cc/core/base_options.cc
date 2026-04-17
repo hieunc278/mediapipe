@@ -54,6 +54,16 @@ proto::Acceleration ConvertDelegateOptionsToAccelerationProto(
   return acceleration_proto;
 }
 
+proto::Acceleration ConvertDelegateOptionsToAccelerationProto(
+    const BaseOptions::NpuOptions& options) {
+  proto::Acceleration acceleration_proto = proto::Acceleration();
+  auto* npu = acceleration_proto.mutable_npu();
+  if (!options.dispatch_library_directory.empty()) {
+    npu->set_dispatch_library_directory(options.dispatch_library_directory);
+  }
+  return acceleration_proto;
+}
+
 template <typename T>
 void SetDelegateOptionsOrDie(const BaseOptions* base_options,
                              proto::BaseOptions& base_options_proto) {
@@ -115,6 +125,11 @@ proto::BaseOptions ConvertBaseOptionsToProto(BaseOptions* base_options) {
       base_options_proto.mutable_acceleration()
           ->mutable_nnapi()
           ->set_accelerator_name("google-edgetpu");
+      break;
+    case BaseOptions::Delegate::NPU:
+      base_options_proto.mutable_acceleration()->mutable_npu();
+      SetDelegateOptionsOrDie<BaseOptions::NpuOptions>(base_options,
+                                                       base_options_proto);
       break;
   }
   return base_options_proto;

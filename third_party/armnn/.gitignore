@@ -1,0 +1,4 @@
+# Arm NN prebuilt binaries — staged locally by build_npu_aar.sh before build.
+# Do NOT commit the .so binaries (large, platform-specific).
+# DO commit the BUILD.bazel, include/ headers, and directory structure.
+lib/

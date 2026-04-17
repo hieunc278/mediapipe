@@ -34,5 +34,8 @@ message Acceleration {
     mediapipe.InferenceCalculatorOptions.Delegate.Gpu gpu = 2;
     mediapipe.InferenceCalculatorOptions.Delegate.TfLite tflite = 4;
     mediapipe.InferenceCalculatorOptions.Delegate.Nnapi nnapi = 5;
+    // Arm NN delegate targeting the Arm Ethos-N78 NPU (EthosNAcc backend).
+    // Falls back to CpuRef for any ops not supported by the NPU.
+    mediapipe.InferenceCalculatorOptions.Delegate.Npu npu = 6;
   }
 }

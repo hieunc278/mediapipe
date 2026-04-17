@@ -1,0 +1,87 @@
+# Arm NN prebuilt libraries for the Telechips Arm Ethos-N78 NPU.
+#
+# The actual .so files and headers are staged into this directory by
+# build_npu_aar.sh before bazel build is invoked.
+#
+# Layout after staging:
+#   third_party/armnn/
+#     include/
+#       armnn/           (Arm NN public headers from armnn/include/armnn/)
+#       armnn_delegate.hpp
+#       DelegateOptions.hpp
+#     lib/arm64-v8a/
+#       libarmnn.so(.35)
+#       libarmnnDelegate.so(.29)
+#       libEthosNDriver.so
+#       libEthosNSupport.so
+
+package(default_visibility = ["//visibility:public"])
+
+# ---------------------------------------------------------------------------
+# Arm NN runtime (with EthosNAcc backend compiled in)
+# ---------------------------------------------------------------------------
+cc_library(
+    name = "armnn",
+    srcs = [
+        "lib/arm64-v8a/libarmnn.so.35",
+        "lib/arm64-v8a/libarmnn.so.35.0",
+    ],
+    hdrs = glob(
+        [
+            "include/armnn/**/*.hpp",
+            "include/armnn/**/*.h",
+            "include/armnnUtils/**/*.hpp",
+            "include/armnnUtils/**/*.h",
+            "include/armnnDeserializer/**/*.hpp",
+            "include/armnnSerializer/**/*.hpp",
+            "include/armnnTfLiteParser/**/*.hpp",
+            "include/armnnOnnxParser/**/*.hpp",
+        ],
+        allow_empty = True,
+    ),
+    strip_include_prefix = "include",
+)
+
+# ---------------------------------------------------------------------------
+# Arm NN TfLite classic delegate
+# Exports: TfLiteArmnnDelegateCreate / TfLiteArmnnDelegateDelete
+# ---------------------------------------------------------------------------
+cc_library(
+    name = "armnn_delegate",
+    srcs = [
+        "lib/arm64-v8a/libarmnnDelegate.so.29",
+        "lib/arm64-v8a/libarmnnDelegate.so.29.1",
+    ],
+    hdrs = [
+        "include/armnn_delegate.hpp",
+        "include/DelegateOptions.hpp",
+    ],
+    strip_include_prefix = "include",
+    deps = [
+        ":armnn",
+        "@org_tensorflow//tensorflow/lite:framework_stable",
+        "@org_tensorflow//tensorflow/lite/c:common",
+        "@org_tensorflow//tensorflow/lite/c:c_api_types",
+    ],
+)
+
+# ---------------------------------------------------------------------------
+# Ethos-N driver support libraries (needed at runtime on the device)
+# ---------------------------------------------------------------------------
+cc_library(
+    name = "ethos_n_driver",
+    srcs = ["lib/arm64-v8a/libEthosNDriver.so"],
+)
+
+cc_library(
+    name = "ethos_n_support",
+    srcs = ["lib/arm64-v8a/libEthosNSupport.so"],
+)
+
+# ---------------------------------------------------------------------------
+# Filegroup: all Arm NN .so files bundled in the AAR jni/arm64-v8a/ folder.
+# ---------------------------------------------------------------------------
+filegroup(
+    name = "armnn_jni_libs",
+    srcs = glob(["lib/arm64-v8a/*.so"]),
+)

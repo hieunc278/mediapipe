@@ -49,6 +49,9 @@ struct BaseOptions {
     GPU = 1,
     // Edge TPU acceleration using NNAPI delegate.
     EDGETPU_NNAPI = 2,
+    // Arm NN delegate targeting the Arm Ethos-N78 NPU via the EthosNAcc backend.
+    // Requires libarmnn.so and libarmnnDelegate.so built with EthosN support.
+    NPU = 3,
   };
 
   Delegate delegate = CPU;
@@ -77,6 +80,14 @@ struct BaseOptions {
     std::string model_token;
   };
 
+  // Options for NPU (Arm NN / Arm Ethos-N78 EthosNAcc backend).
+  struct NpuOptions {
+    // Optional directory that will be searched for Arm NN dynamic backend
+    // shared libraries (*.so). Leave empty to use only statically-linked
+    // backends (the default when libarmnn.so already includes EthosNAcc).
+    std::string dispatch_library_directory;
+  };
+
   // The file descriptor to a file opened with open(2), with optional additional
   // offset and length information.
   struct FileDescriptorMeta {
@@ -99,7 +110,7 @@ struct BaseOptions {
 
   // Options for the chosen delegate. If not set, the default delegate options
   // is used.
-  std::optional<std::variant<CpuOptions, GpuOptions>> delegate_options;
+  std::optional<std::variant<CpuOptions, GpuOptions, NpuOptions>> delegate_options;
 
   // Disallows/disables default initialization of MediaPipe graph services. This
   // can be used to disable default OpenCL context creation so that the whole

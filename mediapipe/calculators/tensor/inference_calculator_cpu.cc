@@ -35,6 +35,15 @@
 #endif  // ANDROID
 #include "tensorflow/lite/delegates/xnnpack/xnnpack_delegate.h"
 
+// Arm NN delegate for Arm Ethos-N78 NPU (EthosNAcc backend).
+// Uses the TfLite External Delegate C API (tflite_plugin_create_delegate) to
+// avoid C++ STL ABI mismatch between the NDK libc++ and the Arm NN libstdc++.
+// Build with --define arm_npu=1.
+#if defined(MEDIAPIPE_ARMNN_DELEGATE)
+#include "tensorflow/lite/delegates/external/external_delegate.h"
+#include <string>
+#endif  // MEDIAPIPE_ARMNN_DELEGATE
+
 namespace mediapipe {
 namespace api2 {
 
@@ -151,6 +160,35 @@ InferenceCalculatorCpuImpl::MaybeCreateDelegate(CalculatorContext* cc) {
 #else
   const bool use_xnnpack = opts_has_delegate && opts_delegate.has_xnnpack();
 #endif  // defined(__EMSCRIPTEN__)
+
+#if defined(MEDIAPIPE_ARMNN_DELEGATE)
+  // Arm NN delegate targeting the Arm Ethos-N78 NPU via the TfLite External
+  // Delegate C API.  The delegate .so is loaded at runtime via dlopen so there
+  // is no C++ STL ABI boundary between the NDK build and the Arm NN library.
+  // dispatch_library_directory must point to the directory containing
+  // libarmnnDelegate.so at runtime (pushed to the device by the app).
+  const bool npu_requested = opts_has_delegate && opts_delegate.has_npu();
+  if (npu_requested) {
+    const auto& npu_proto = opts_delegate.npu();
+    if (!npu_proto.has_dispatch_library_directory() ||
+        npu_proto.dispatch_library_directory().empty()) {
+      return absl::InvalidArgumentError(
+          "NPU delegate requires dispatch_library_directory pointing to "
+          "the directory containing libarmnnDelegate.so.");
+    }
+    const std::string lib_path =
+        npu_proto.dispatch_library_directory() + "/libarmnnDelegate.so";
+    TfLiteExternalDelegateOptions ext_opts =
+        TfLiteExternalDelegateOptionsDefault(lib_path.c_str());
+    TfLiteExternalDelegateOptionsInsert(&ext_opts, "backends", "EthosNAcc,CpuRef");
+    TfLiteDelegate* armnn_delegate = TfLiteExternalDelegateCreate(&ext_opts);
+    if (armnn_delegate == nullptr) {
+      return absl::UnavailableError(
+          "Failed to create Arm NN external delegate for Ethos-N78 NPU.");
+    }
+    return TfLiteDelegatePtr(armnn_delegate, TfLiteExternalDelegateDelete);
+  }
+#endif  // MEDIAPIPE_ARMNN_DELEGATE
 
   if (use_xnnpack) {
     auto xnnpack_opts = TfLiteXNNPackDelegateOptionsDefault();

@@ -14,7 +14,8 @@
 #
 
 load("@bazel_skylib//lib:selects.bzl", "selects")
-load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl", "cc_library_with_tflite")
+load("@org_tensorflow//tensorflow/lite/core/shims:cc_library_with_tflite.bzl",
+     "cc_library_with_tflite")
 load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("@rules_cc//cc:cc_test.bzl", "cc_test")
 load("@rules_cc//cc:objc_library.bzl", "objc_library")
@@ -29,65 +30,65 @@ load(
 
 licenses(["notice"])
 
-package(default_visibility = ["//visibility:public"])
+package(default_visibility=["//visibility:public"])
 
 exports_files(
     glob(["testdata/image_to_tensor/*"]),
-    visibility = [
+    visibility=[
         "//mediapipe/calculators/image:__subpackages__",
         "//mediapipe/util:__subpackages__",
     ],
 )
 
 config_setting(
-    name = "disable_gpu",
-    define_values = {
+    name="disable_gpu",
+    define_values={
         "MEDIAPIPE_DISABLE_GPU": "1",
     },
-    visibility = ["//visibility:public"],
+    visibility=["//visibility:public"],
 )
 
 more_selects.config_setting_negation(
-    name = "not_disable_gpu",
-    negate = ":disable_gpu",
+    name="not_disable_gpu",
+    negate=":disable_gpu",
 )
 
 selects.config_setting_group(
-    name = "platform_apple_with_gpu",
-    match_all = [
+    name="platform_apple_with_gpu",
+    match_all=[
         ":not_disable_gpu",
         "//mediapipe:apple",
     ],
 )
 
 selects.config_setting_group(
-    name = "platform_apple_without_gpu",
-    match_all = [
+    name="platform_apple_without_gpu",
+    match_all=[
         ":disable_gpu",
         "//mediapipe:apple",
     ],
 )
 
 selects.config_setting_group(
-    name = "compute_shader_unavailable",
-    match_any = [
+    name="compute_shader_unavailable",
+    match_any=[
         "//mediapipe/gpu:disable_gpu",
     ],
 )
 
 mediapipe_proto_library(
-    name = "audio_to_tensor_calculator_proto",
-    srcs = ["audio_to_tensor_calculator.proto"],
-    deps = [
+    name="audio_to_tensor_calculator_proto",
+    srcs=["audio_to_tensor_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
     ],
 )
 
 cc_library(
-    name = "audio_to_tensor_calculator",
-    srcs = ["audio_to_tensor_calculator.cc"],
-    deps = [
+    name="audio_to_tensor_calculator",
+    srcs=["audio_to_tensor_calculator.cc"],
+    deps=[
         ":audio_to_tensor_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:memory_manager",
@@ -110,13 +111,13 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/c:common",
         "@pffft",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_test(
-    name = "audio_to_tensor_calculator_test",
-    srcs = ["audio_to_tensor_calculator_test.cc"],
-    deps = [
+    name="audio_to_tensor_calculator_test",
+    srcs=["audio_to_tensor_calculator_test.cc"],
+    deps=[
         ":audio_to_tensor_calculator",
         ":audio_to_tensor_calculator_cc_proto",
         "//mediapipe/framework:calculator_cc_proto",
@@ -134,18 +135,18 @@ cc_test(
 )
 
 mediapipe_proto_library(
-    name = "tensors_to_audio_calculator_proto",
-    srcs = ["tensors_to_audio_calculator.proto"],
-    deps = [
+    name="tensors_to_audio_calculator_proto",
+    srcs=["tensors_to_audio_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
     ],
 )
 
 cc_library(
-    name = "tensors_to_audio_calculator",
-    srcs = ["tensors_to_audio_calculator.cc"],
-    deps = [
+    name="tensors_to_audio_calculator",
+    srcs=["tensors_to_audio_calculator.cc"],
+    deps=[
         ":tensors_to_audio_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework/api2:node",
@@ -157,13 +158,13 @@ cc_library(
         "@com_google_audio_tools//audio/dsp:window_functions",
         "@pffft",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_test(
-    name = "tensors_to_audio_calculator_test",
-    srcs = ["tensors_to_audio_calculator_test.cc"],
-    deps = [
+    name="tensors_to_audio_calculator_test",
+    srcs=["tensors_to_audio_calculator_test.cc"],
+    deps=[
         ":audio_to_tensor_calculator",
         ":audio_to_tensor_calculator_cc_proto",
         ":tensors_to_audio_calculator",
@@ -179,18 +180,18 @@ cc_test(
 )
 
 mediapipe_proto_library(
-    name = "feedback_tensors_calculator_proto",
-    srcs = ["feedback_tensors_calculator.proto"],
-    deps = [
+    name="feedback_tensors_calculator_proto",
+    srcs=["feedback_tensors_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
     ],
 )
 
 cc_library(
-    name = "feedback_tensors_calculator",
-    srcs = ["feedback_tensors_calculator.cc"],
-    deps = [
+    name="feedback_tensors_calculator",
+    srcs=["feedback_tensors_calculator.cc"],
+    deps=[
         ":feedback_tensors_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:memory_manager",
@@ -200,13 +201,13 @@ cc_library(
         "//mediapipe/framework/formats:tensor",
         "@com_google_absl//absl/status",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_test(
-    name = "feedback_tensors_calculator_test",
-    srcs = ["feedback_tensors_calculator_test.cc"],
-    deps = [
+    name="feedback_tensors_calculator_test",
+    srcs=["feedback_tensors_calculator_test.cc"],
+    deps=[
         ":feedback_tensors_calculator",
         ":feedback_tensors_calculator_cc_proto",
         "//mediapipe/framework:calculator_cc_proto",
@@ -221,18 +222,18 @@ cc_test(
 )
 
 mediapipe_proto_library(
-    name = "bert_preprocessor_calculator_proto",
-    srcs = ["bert_preprocessor_calculator.proto"],
-    deps = [
+    name="bert_preprocessor_calculator_proto",
+    srcs=["bert_preprocessor_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
     ],
 )
 
 cc_library(
-    name = "bert_preprocessor_calculator",
-    srcs = ["bert_preprocessor_calculator.cc"],
-    deps = [
+    name="bert_preprocessor_calculator",
+    srcs=["bert_preprocessor_calculator.cc"],
+    deps=[
         ":bert_preprocessor_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:memory_manager",
@@ -250,17 +251,17 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_test(
-    name = "bert_preprocessor_calculator_test",
-    srcs = ["bert_preprocessor_calculator_test.cc"],
-    data = [
+    name="bert_preprocessor_calculator_test",
+    srcs=["bert_preprocessor_calculator_test.cc"],
+    data=[
         "//mediapipe/tasks/testdata/text:bert_text_classifier_models",
     ],
-    linkopts = ["-ldl"],
-    deps = [
+    linkopts=["-ldl"],
+    deps=[
         ":bert_preprocessor_calculator",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework/formats:tensor",
@@ -276,18 +277,18 @@ cc_test(
 )
 
 mediapipe_proto_library(
-    name = "regex_preprocessor_calculator_proto",
-    srcs = ["regex_preprocessor_calculator.proto"],
-    deps = [
+    name="regex_preprocessor_calculator_proto",
+    srcs=["regex_preprocessor_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
     ],
 )
 
 cc_library(
-    name = "regex_preprocessor_calculator",
-    srcs = ["regex_preprocessor_calculator.cc"],
-    deps = [
+    name="regex_preprocessor_calculator",
+    srcs=["regex_preprocessor_calculator.cc"],
+    deps=[
         ":regex_preprocessor_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:memory_manager",
@@ -302,15 +303,15 @@ cc_library(
         "//mediapipe/tasks/metadata:metadata_schema_cc",
         "@com_google_absl//absl/status",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_test(
-    name = "regex_preprocessor_calculator_test",
-    srcs = ["regex_preprocessor_calculator_test.cc"],
-    data = ["//mediapipe/tasks/testdata/text:text_classifier_models"],
-    linkopts = ["-ldl"],
-    deps = [
+    name="regex_preprocessor_calculator_test",
+    srcs=["regex_preprocessor_calculator_test.cc"],
+    data=["//mediapipe/tasks/testdata/text:text_classifier_models"],
+    linkopts=["-ldl"],
+    deps=[
         ":regex_preprocessor_calculator",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework/formats:tensor",
@@ -327,9 +328,9 @@ cc_test(
 )
 
 cc_library(
-    name = "text_to_tensor_calculator",
-    srcs = ["text_to_tensor_calculator.cc"],
-    deps = [
+    name="text_to_tensor_calculator",
+    srcs=["text_to_tensor_calculator.cc"],
+    deps=[
         "//mediapipe/framework:calculator_context",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:memory_manager",
@@ -340,13 +341,13 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_test(
-    name = "text_to_tensor_calculator_test",
-    srcs = ["text_to_tensor_calculator_test.cc"],
-    deps = [
+    name="text_to_tensor_calculator_test",
+    srcs=["text_to_tensor_calculator_test.cc"],
+    deps=[
         ":text_to_tensor_calculator",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:calculator_graph",
@@ -362,9 +363,9 @@ cc_test(
 )
 
 cc_library(
-    name = "universal_sentence_encoder_preprocessor_calculator",
-    srcs = ["universal_sentence_encoder_preprocessor_calculator.cc"],
-    deps = [
+    name="universal_sentence_encoder_preprocessor_calculator",
+    srcs=["universal_sentence_encoder_preprocessor_calculator.cc"],
+    deps=[
         "//mediapipe/framework:calculator_context",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:memory_manager",
@@ -378,14 +379,14 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_test(
-    name = "universal_sentence_encoder_preprocessor_calculator_test",
-    srcs = ["universal_sentence_encoder_preprocessor_calculator_test.cc"],
-    data = ["//mediapipe/tasks/testdata/text:universal_sentence_encoder_qa"],
-    deps = [
+    name="universal_sentence_encoder_preprocessor_calculator_test",
+    srcs=["universal_sentence_encoder_preprocessor_calculator_test.cc"],
+    data=["//mediapipe/tasks/testdata/text:universal_sentence_encoder_qa"],
+    deps=[
         ":universal_sentence_encoder_preprocessor_calculator",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:packet",
@@ -403,20 +404,20 @@ cc_test(
 )
 
 mediapipe_proto_library(
-    name = "inference_calculator_proto",
-    srcs = ["inference_calculator.proto"],
-    deps = [
+    name="inference_calculator_proto",
+    srcs=["inference_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
     ],
 )
 
 config_setting(
-    name = "force_cpu_inference",
-    values = {
+    name="force_cpu_inference",
+    values={
         "define": "MEDIAPIPE_FORCE_CPU_INFERENCE=true",
     },
-    visibility = ["//visibility:public"],
+    visibility=["//visibility:public"],
 )
 
 # This target defines the "InferenceCalculator" component, which looks for the available concrete
@@ -428,21 +429,21 @@ config_setting(
 # :inference_calculator.
 # In all cases, use "InferenceCalculator" in your graphs.
 cc_library_with_tflite(
-    name = "inference_calculator_interface",
-    srcs = ["inference_calculator.cc"],
-    hdrs = ["inference_calculator.h"],
-    local_defines = select({
+    name="inference_calculator_interface",
+    srcs=["inference_calculator.cc"],
+    hdrs=["inference_calculator.h"],
+    local_defines=select({
         ":force_cpu_inference": ["MEDIAPIPE_FORCE_CPU_INFERENCE=1"],
         "//conditions:default": ["MEDIAPIPE_FORCE_CPU_INFERENCE=0"],
     }),
-    tflite_deps = [
+    tflite_deps=[
         ":inference_runner",
         ":inference_io_mapper",
         "//mediapipe/util/tflite:tflite_model_loader",
         "@org_tensorflow//tensorflow/lite:framework_stable",
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ],
-    deps = [
+    deps=[
         ":inference_calculator_cc_proto",
         ":inference_calculator_options_lib",
         ":tensor_span",
@@ -469,28 +470,28 @@ cc_library_with_tflite(
         "@com_google_absl//absl/time",
         "@org_tensorflow//tensorflow/lite/core/api:op_resolver",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 # Helper utility to more easily iterate over a collection of Tensor references
 cc_library(
-    name = "tensor_span",
-    srcs = ["tensor_span.cc"],
-    hdrs = ["tensor_span.h"],
-    deps = ["//mediapipe/framework/formats:tensor"],
+    name="tensor_span",
+    srcs=["tensor_span.cc"],
+    hdrs=["tensor_span.h"],
+    deps=["//mediapipe/framework/formats:tensor"],
 )
 
 cc_library_with_tflite(
-    name = "inference_io_mapper",
-    srcs = ["inference_io_mapper.cc"],
-    hdrs = ["inference_io_mapper.h"],
-    tflite_deps = [
+    name="inference_io_mapper",
+    srcs=["inference_io_mapper.cc"],
+    hdrs=["inference_io_mapper.h"],
+    tflite_deps=[
         "@org_tensorflow//tensorflow/lite/c:c_api_types",
         "@org_tensorflow//tensorflow/lite:framework_stable",
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
         "//mediapipe/util/tflite:tflite_signature_reader",
     ],
-    deps = [
+    deps=[
         ":inference_calculator_cc_proto",
         ":tensor_span",
         "//mediapipe/framework/formats:tensor",
@@ -508,13 +509,13 @@ cc_library_with_tflite(
 
 # TODO b/336756170 - convert test to use cc_test_with_tflite
 cc_test(
-    name = "inference_io_mapper_test",
-    srcs = ["inference_io_mapper_test.cc"],
-    data = [
+    name="inference_io_mapper_test",
+    srcs=["inference_io_mapper_test.cc"],
+    data=[
         ":testdata/3in3out_model_swaps_input_2_and_0.tflite",
         ":testdata/test_two_signature_keys_model.tflite",
     ],
-    deps = [
+    deps=[
         ":inference_calculator",
         ":inference_calculator_cc_proto",
         ":inference_calculator_cpu",
@@ -537,10 +538,10 @@ cc_test(
 )
 
 cc_library_with_tflite(
-    name = "inference_feedback_manager",
-    srcs = ["inference_feedback_manager.cc"],
-    hdrs = ["inference_feedback_manager.h"],
-    tflite_deps = [
+    name="inference_feedback_manager",
+    srcs=["inference_feedback_manager.cc"],
+    hdrs=["inference_feedback_manager.h"],
+    tflite_deps=[
         ":inference_io_mapper",
         "//mediapipe/util/tflite:utils",
         "//mediapipe/util/tflite:tflite_signature_reader",
@@ -549,7 +550,7 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/c:common",
         "@org_tensorflow//tensorflow/lite/kernels:builtin_ops",
     ],
-    deps = [
+    deps=[
         ":inference_calculator_cc_proto",
         ":inference_calculator_utils",
         "//mediapipe/framework/port:ret_check",
@@ -565,14 +566,14 @@ cc_library_with_tflite(
 )
 
 cc_test(
-    name = "inference_feedback_manager_test",
-    srcs = ["inference_feedback_manager_test.cc"],
-    data = [
+    name="inference_feedback_manager_test",
+    srcs=["inference_feedback_manager_test.cc"],
+    data=[
         ":testdata/feedback_tensor_test_model.tflite",
         ":testdata/feedback_tensor_with_state_copy_model.tflite",
         ":testdata/feedback_tensor_without_passthrough_model.tflite",
     ],
-    deps = [
+    deps=[
         ":inference_calculator",
         ":inference_calculator_cc_proto",
         ":inference_calculator_cpu",
@@ -600,10 +601,10 @@ cc_test(
 )
 
 cc_library(
-    name = "inference_calculator_gl",
-    srcs = ["inference_calculator_gl.cc"],
-    tags = ["nomac"],  # config problem with cpuinfo via TF
-    deps = [
+    name="inference_calculator_gl",
+    srcs=["inference_calculator_gl.cc"],
+    tags=["nomac"],  # config problem with cpuinfo via TF
+    deps=[
         ":inference_calculator_cc_proto",
         ":inference_calculator_interface",
         ":inference_io_mapper",
@@ -628,14 +629,14 @@ cc_library(
         "@org_tensorflow//tensorflow/lite/core:framework",
         "@org_tensorflow//tensorflow/lite/delegates/gpu:gl_delegate",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_library(
-    name = "inference_calculator_gl_advanced",
-    srcs = ["inference_calculator_gl_advanced.cc"],
-    tags = ["nomac"],
-    deps = [
+    name="inference_calculator_gl_advanced",
+    srcs=["inference_calculator_gl_advanced.cc"],
+    tags=["nomac"],
+    deps=[
         ":inference_calculator_interface",
         ":inference_io_mapper",
         ":inference_on_disk_cache_helper",
@@ -659,18 +660,18 @@ cc_library(
         "@com_google_absl//absl/time",
         "@org_tensorflow//tensorflow/lite:framework_stable",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_library(
-    name = "inference_calculator_metal",
-    srcs = ["inference_calculator_metal.cc"],
-    copts = [
+    name="inference_calculator_metal",
+    srcs=["inference_calculator_metal.cc"],
+    copts=[
         "-x objective-c++",
         "-fobjc-arc",  # enable reference-counting
     ],
-    tags = ["ios"],
-    deps = [
+    tags=["ios"],
+    deps=[
         ":inference_calculator_interface",
         ":inference_io_mapper",
         ":tensor_span",
@@ -695,16 +696,16 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_library_with_tflite(
-    name = "inference_runner",
-    hdrs = ["inference_runner.h"],
-    tflite_deps = [
+    name="inference_runner",
+    hdrs=["inference_runner.h"],
+    tflite_deps=[
         ":inference_io_mapper",
     ],
-    deps = [
+    deps=[
         ":tensor_span",
         "//mediapipe/framework:calculator_context",
         "//mediapipe/framework/formats:tensor",
@@ -713,18 +714,18 @@ cc_library_with_tflite(
 )
 
 cc_library_with_tflite(
-    name = "tflite_delegate_ptr",
-    hdrs = ["tflite_delegate_ptr.h"],
-    tflite_deps = [
+    name="tflite_delegate_ptr",
+    hdrs=["tflite_delegate_ptr.h"],
+    tflite_deps=[
         "@org_tensorflow//tensorflow/lite/c:c_api_types",
     ],
 )
 
 cc_library_with_tflite(
-    name = "inference_interpreter_delegate_runner",
-    srcs = ["inference_interpreter_delegate_runner.cc"],
-    hdrs = ["inference_interpreter_delegate_runner.h"],
-    tflite_deps = [
+    name="inference_interpreter_delegate_runner",
+    srcs=["inference_interpreter_delegate_runner.cc"],
+    hdrs=["inference_interpreter_delegate_runner.h"],
+    tflite_deps=[
         ":inference_runner",
         ":tflite_delegate_ptr",
         ":inference_io_mapper",
@@ -734,7 +735,7 @@ cc_library_with_tflite(
         "@org_tensorflow//tensorflow/lite/c:c_api_types",
         "@org_tensorflow//tensorflow/lite/c:common",
     ],
-    deps = [
+    deps=[
         ":inference_calculator_utils",
         ":tensor_span",
         "//mediapipe/framework:calculator_framework",
@@ -754,14 +755,14 @@ cc_library_with_tflite(
 )
 
 cc_test(
-    name = "inference_interpreter_delegate_runner_test",
-    srcs = ["inference_interpreter_delegate_runner_test.cc"],
-    data = [
+    name="inference_interpreter_delegate_runner_test",
+    srcs=["inference_interpreter_delegate_runner_test.cc"],
+    data=[
         ":testdata/1x3_square_float32.tflite",
         ":testdata/1x3_square_int32.tflite",
         ":testdata/3in3out_model_swaps_input_2_and_0.tflite",
     ],
-    deps = [
+    deps=[
         ":inference_interpreter_delegate_runner",
         ":tensor_span",
         ":tflite_delegate_ptr",
@@ -787,15 +788,18 @@ cc_test(
 )
 
 cc_library(
-    name = "inference_calculator_cpu",
-    srcs = [
+    name="inference_calculator_cpu",
+    srcs=[
         "inference_calculator_cpu.cc",
     ],
-    local_defines = select({
+    local_defines=select({
         ":force_cpu_inference": ["MEDIAPIPE_FORCE_CPU_INFERENCE=1"],
         "//conditions:default": ["MEDIAPIPE_FORCE_CPU_INFERENCE=0"],
+    }) + select({
+        "//mediapipe:arm_npu": ["MEDIAPIPE_ARMNN_DELEGATE=1"],
+        "//conditions:default": [],
     }),
-    deps = [
+    deps=[
         ":inference_calculator_interface",
         ":inference_calculator_utils",
         ":inference_interpreter_delegate_runner",
@@ -815,15 +819,18 @@ cc_library(
     ] + select({
         "//conditions:default": [],
         "//mediapipe:android": ["@org_tensorflow//tensorflow/lite/delegates/nnapi:nnapi_delegate"],
+    }) + select({
+        "//mediapipe:arm_npu": ["@org_tensorflow//tensorflow/lite/delegates/external:external_delegate"],
+        "//conditions:default": [],
     }),
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_library(
-    name = "inference_calculator_utils",
-    srcs = ["inference_calculator_utils.cc"],
-    hdrs = ["inference_calculator_utils.h"],
-    deps = [
+    name="inference_calculator_utils",
+    srcs=["inference_calculator_utils.cc"],
+    hdrs=["inference_calculator_utils.h"],
+    deps=[
         ":inference_calculator_cc_proto",
         "//mediapipe/framework:memory_manager",
         "//mediapipe/framework:port",
@@ -850,13 +857,13 @@ cc_library(
             "//mediapipe/util:cpu_util",
         ],
     }),
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_test(
-    name = "inference_calculator_utils_test",
-    srcs = ["inference_calculator_utils_test.cc"],
-    deps = [
+    name="inference_calculator_utils_test",
+    srcs=["inference_calculator_utils_test.cc"],
+    deps=[
         ":inference_calculator_cc_proto",
         ":inference_calculator_utils",
         "//mediapipe/framework/formats:tensor",
@@ -876,11 +883,11 @@ cc_test(
 )
 
 cc_library(
-    name = "inference_on_disk_cache_helper",
-    srcs = ["inference_on_disk_cache_helper.cc"],
-    hdrs = ["inference_on_disk_cache_helper.h"],
-    tags = ["nomac"],
-    deps = [
+    name="inference_on_disk_cache_helper",
+    srcs=["inference_on_disk_cache_helper.cc"],
+    hdrs=["inference_on_disk_cache_helper.h"],
+    tags=["nomac"],
+    deps=[
         ":inference_calculator_cc_proto",
         ":inference_calculator_interface",
         ":inference_io_mapper",
@@ -897,11 +904,11 @@ cc_library(
 )
 
 cc_library(
-    name = "inference_calculator_xnnpack",
-    srcs = [
+    name="inference_calculator_xnnpack",
+    srcs=[
         "inference_calculator_xnnpack.cc",
     ],
-    deps = [
+    deps=[
         ":inference_calculator_interface",
         ":inference_calculator_utils",
         ":inference_interpreter_delegate_runner",
@@ -916,12 +923,12 @@ cc_library(
         "@com_google_absl//absl/time",
         "@org_tensorflow//tensorflow/lite/delegates/xnnpack:xnnpack_delegate",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_library(
-    name = "inference_calculator_gl_if_compute_shader_available",
-    deps = selects.with_or({
+    name="inference_calculator_gl_if_compute_shader_available",
+    deps=selects.with_or({
         ":compute_shader_unavailable": [],
         "//conditions:default": [
             ":inference_calculator_gl",
@@ -935,8 +942,8 @@ cc_library(
 # for clients that want a narrower set of implementations than the default should see the comment on
 # inference_calculator_interface.
 cc_library(
-    name = "inference_calculator",
-    deps = [
+    name="inference_calculator",
+    deps=[
         ":inference_calculator_cpu",
         ":inference_calculator_interface",
         ":inference_calculator_xnnpack",
@@ -944,13 +951,13 @@ cc_library(
         "//conditions:default": [":inference_calculator_gl_if_compute_shader_available"],
         ":platform_apple_with_gpu": [":inference_calculator_metal"],
     }),
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 mediapipe_proto_library(
-    name = "tensor_converter_calculator_proto",
-    srcs = ["tensor_converter_calculator.proto"],
-    deps = [
+    name="tensor_converter_calculator_proto",
+    srcs=["tensor_converter_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
         "//mediapipe/gpu:gpu_origin_proto",
@@ -958,17 +965,18 @@ mediapipe_proto_library(
 )
 
 cc_library(
-    name = "tensor_converter_calculator",
-    srcs = ["tensor_converter_calculator.cc"],
-    copts = select({
+    name="tensor_converter_calculator",
+    srcs=["tensor_converter_calculator.cc"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    features = ["-layering_check"],  # allow depending on tensor_converter_calculator_gpu_deps
-    deps = [
+    # allow depending on tensor_converter_calculator_gpu_deps
+    features=["-layering_check"],
+    deps=[
         ":tensor_converter_calculator_cc_proto",
         ":tensor_converter_cpu",
         ":tensor_converter_gpu",
@@ -1008,14 +1016,14 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_library(
-    name = "tensor_converter_cpu",
-    srcs = ["tensor_converter_cpu.cc"],
-    hdrs = ["tensor_converter_cpu.h"],
-    deps = [
+    name="tensor_converter_cpu",
+    srcs=["tensor_converter_cpu.cc"],
+    hdrs=["tensor_converter_cpu.h"],
+    deps=[
         "//mediapipe/framework:memory_manager",
         "//mediapipe/framework/formats:image_frame",
         "//mediapipe/framework/formats:matrix",
@@ -1028,9 +1036,9 @@ cc_library(
 )
 
 cc_test(
-    name = "tensor_converter_cpu_test",
-    srcs = ["tensor_converter_cpu_test.cc"],
-    deps = [
+    name="tensor_converter_cpu_test",
+    srcs=["tensor_converter_cpu_test.cc"],
+    deps=[
         ":tensor_converter_cpu",
         "//mediapipe/framework:memory_manager",
         "//mediapipe/framework/formats:matrix",
@@ -1043,9 +1051,9 @@ cc_test(
 )
 
 cc_library(
-    name = "tensor_converter_gpu",
-    hdrs = ["tensor_converter_gpu.h"],
-    deps = [
+    name="tensor_converter_gpu",
+    hdrs=["tensor_converter_gpu.h"],
+    deps=[
         "//mediapipe/framework:memory_manager",
         "//mediapipe/framework/formats:tensor",
         "//mediapipe/gpu:gpu_buffer",
@@ -1054,11 +1062,12 @@ cc_library(
 )
 
 cc_library(
-    name = "tensor_converter_gl30",
-    srcs = ["tensor_converter_gl30.cc"],
-    hdrs = ["tensor_converter_gl30.h"],
-    features = ["-layering_check"],  # allow depending on tensor_converter_calculator_gpu_deps
-    deps = [
+    name="tensor_converter_gl30",
+    srcs=["tensor_converter_gl30.cc"],
+    hdrs=["tensor_converter_gl30.h"],
+    # allow depending on tensor_converter_calculator_gpu_deps
+    features=["-layering_check"],
+    deps=[
         ":tensor_converter_gpu",
         "//mediapipe/framework:port",
         "//mediapipe/framework/port:status",
@@ -1086,25 +1095,26 @@ cc_library(
 )
 
 cc_library(
-    name = "tensor_converter_metal",
-    srcs = ["tensor_converter_metal.cc"],
-    hdrs = ["tensor_converter_metal.h"],
-    copts = select({
+    name="tensor_converter_metal",
+    srcs=["tensor_converter_metal.cc"],
+    hdrs=["tensor_converter_metal.h"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    features = ["-layering_check"],  # allow depending on tensor_converter_calculator_gpu_deps
-    linkopts = select({
+    # allow depending on tensor_converter_calculator_gpu_deps
+    features=["-layering_check"],
+    linkopts=select({
         "//mediapipe:apple": [
             "-framework CoreVideo",
             "-framework MetalKit",
         ],
         "//conditions:default": [],
     }),
-    deps = [
+    deps=[
         "//mediapipe/framework:port",
     ] + select({
         "//mediapipe:apple": [
@@ -1120,11 +1130,12 @@ cc_library(
 )
 
 cc_library(
-    name = "tensor_converter_gl31",
-    srcs = ["tensor_converter_gl31.cc"],
-    hdrs = ["tensor_converter_gl31.h"],
-    features = ["-layering_check"],  # allow depending on tensor_converter_calculator_gpu_deps
-    deps = [
+    name="tensor_converter_gl31",
+    srcs=["tensor_converter_gl31.cc"],
+    hdrs=["tensor_converter_gl31.h"],
+    # allow depending on tensor_converter_calculator_gpu_deps
+    features=["-layering_check"],
+    deps=[
         ":tensor_converter_gpu",
         "//mediapipe/framework:port",
         "//mediapipe/framework/port:status",
@@ -1146,9 +1157,9 @@ cc_library(
 )
 
 cc_library(
-    name = "tensor_converter_calculator_gpu_deps",
-    visibility = ["//visibility:private"],
-    deps = select({
+    name="tensor_converter_calculator_gpu_deps",
+    visibility=["//visibility:private"],
+    deps=select({
         "//mediapipe:android": [
             ":tensor_converter_gl30",
             ":tensor_converter_gl31",
@@ -1174,12 +1185,12 @@ cc_library(
 )
 
 cc_test(
-    name = "tensor_converter_calculator_test",
-    srcs = ["tensor_converter_calculator_test.cc"],
-    tags = [
+    name="tensor_converter_calculator_test",
+    srcs=["tensor_converter_calculator_test.cc"],
+    tags=[
         "noasan",  # TODO: Remove noasan tag when SwiftShader supports sanitizers
     ],
-    deps = [
+    deps=[
         ":tensor_converter_calculator",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:calculator_runner",
@@ -1201,26 +1212,27 @@ cc_test(
 )
 
 mediapipe_proto_library(
-    name = "tensors_to_detections_calculator_proto",
-    srcs = ["tensors_to_detections_calculator.proto"],
-    deps = [
+    name="tensors_to_detections_calculator_proto",
+    srcs=["tensors_to_detections_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
     ],
 )
 
 cc_library(
-    name = "tensors_to_detections_calculator",
-    srcs = ["tensors_to_detections_calculator.cc"],
-    copts = select({
+    name="tensors_to_detections_calculator",
+    srcs=["tensors_to_detections_calculator.cc"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    features = ["-layering_check"],  # allow depending on tensors_to_detections_calculator_gpu_deps
-    deps = [
+    # allow depending on tensors_to_detections_calculator_gpu_deps
+    features=["-layering_check"],
+    deps=[
         ":tensors_to_detections_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:port",
@@ -1245,13 +1257,13 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_library(
-    name = "tensors_to_detections_calculator_gpu_deps",
-    visibility = ["//visibility:private"],
-    deps = select({
+    name="tensors_to_detections_calculator_gpu_deps",
+    visibility=["//visibility:private"],
+    deps=select({
         ":platform_apple_with_gpu": [
             "//mediapipe/gpu:MPPMetalHelper",
             "//mediapipe/gpu:MPPMetalUtil",
@@ -1265,25 +1277,25 @@ cc_library(
 )
 
 mediapipe_proto_library(
-    name = "tensors_to_landmarks_calculator_proto",
-    srcs = ["tensors_to_landmarks_calculator.proto"],
-    deps = [
+    name="tensors_to_landmarks_calculator_proto",
+    srcs=["tensors_to_landmarks_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
     ],
 )
 
 cc_library(
-    name = "tensors_to_landmarks_calculator",
-    srcs = ["tensors_to_landmarks_calculator.cc"],
-    copts = select({
+    name="tensors_to_landmarks_calculator",
+    srcs=["tensors_to_landmarks_calculator.cc"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    deps = [
+    deps=[
         ":tensors_to_landmarks_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework/api2:node",
@@ -1292,30 +1304,30 @@ cc_library(
         "//mediapipe/framework/port:ret_check",
         "@com_google_absl//absl/log:absl_check",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 mediapipe_proto_library(
-    name = "landmarks_to_tensor_calculator_proto",
-    srcs = ["landmarks_to_tensor_calculator.proto"],
-    deps = [
+    name="landmarks_to_tensor_calculator_proto",
+    srcs=["landmarks_to_tensor_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
     ],
 )
 
 cc_library(
-    name = "landmarks_to_tensor_calculator",
-    srcs = ["landmarks_to_tensor_calculator.cc"],
-    hdrs = ["landmarks_to_tensor_calculator.h"],
-    copts = select({
+    name="landmarks_to_tensor_calculator",
+    srcs=["landmarks_to_tensor_calculator.cc"],
+    hdrs=["landmarks_to_tensor_calculator.h"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    deps = [
+    deps=[
         ":landmarks_to_tensor_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:memory_manager",
@@ -1325,13 +1337,13 @@ cc_library(
         "//mediapipe/framework/formats:tensor",
         "//mediapipe/framework/port:ret_check",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_test(
-    name = "landmarks_to_tensor_calculator_test",
-    srcs = ["landmarks_to_tensor_calculator_test.cc"],
-    deps = [
+    name="landmarks_to_tensor_calculator_test",
+    srcs=["landmarks_to_tensor_calculator_test.cc"],
+    deps=[
         ":landmarks_to_tensor_calculator",
         ":landmarks_to_tensor_calculator_cc_proto",
         "//mediapipe/framework:calculator_cc_proto",
@@ -1347,38 +1359,38 @@ cc_test(
 )
 
 mediapipe_proto_library(
-    name = "tensors_to_floats_calculator_proto",
-    srcs = ["tensors_to_floats_calculator.proto"],
-    deps = [
+    name="tensors_to_floats_calculator_proto",
+    srcs=["tensors_to_floats_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
     ],
 )
 
 cc_library(
-    name = "tensors_to_floats_calculator",
-    srcs = ["tensors_to_floats_calculator.cc"],
-    copts = select({
+    name="tensors_to_floats_calculator",
+    srcs=["tensors_to_floats_calculator.cc"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    deps = [
+    deps=[
         ":tensors_to_floats_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework/api2:node",
         "//mediapipe/framework/formats:tensor",
         "//mediapipe/framework/port:ret_check",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_test(
-    name = "tensors_to_floats_calculator_test",
-    srcs = ["tensors_to_floats_calculator_test.cc"],
-    deps = [
+    name="tensors_to_floats_calculator_test",
+    srcs=["tensors_to_floats_calculator_test.cc"],
+    deps=[
         ":tensors_to_floats_calculator",
         ":tensors_to_floats_calculator_cc_proto",
         "//mediapipe/framework:calculator_cc_proto",
@@ -1393,16 +1405,16 @@ cc_test(
 )
 
 cc_library(
-    name = "tensors_to_classification_calculator",
-    srcs = ["tensors_to_classification_calculator.cc"],
-    copts = select({
+    name="tensors_to_classification_calculator",
+    srcs=["tensors_to_classification_calculator.cc"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    deps = [
+    deps=[
         ":tensors_to_classification_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:resources",
@@ -1436,13 +1448,13 @@ cc_library(
             "//mediapipe/framework/port:file_helpers",
         ],
     }),
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 mediapipe_proto_library(
-    name = "tensors_to_classification_calculator_proto",
-    srcs = ["tensors_to_classification_calculator.proto"],
-    deps = [
+    name="tensors_to_classification_calculator_proto",
+    srcs=["tensors_to_classification_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
         "//mediapipe/util:label_map_proto",
@@ -1450,10 +1462,10 @@ mediapipe_proto_library(
 )
 
 cc_test(
-    name = "tensors_to_classification_calculator_test",
-    srcs = ["tensors_to_classification_calculator_test.cc"],
-    data = ["testdata/labelmap.txt"],
-    deps = [
+    name="tensors_to_classification_calculator_test",
+    srcs=["tensors_to_classification_calculator_test.cc"],
+    data=["testdata/labelmap.txt"],
+    deps=[
         ":tensors_to_classification_calculator",
         ":tensors_to_classification_calculator_cc_proto",
         "//mediapipe/framework:calculator_cc_proto",
@@ -1469,10 +1481,10 @@ cc_test(
 )
 
 cc_library(
-    name = "tensor_to_joints_calculator",
-    srcs = ["tensor_to_joints_calculator.cc"],
-    hdrs = ["tensor_to_joints_calculator.h"],
-    deps = [
+    name="tensor_to_joints_calculator",
+    srcs=["tensor_to_joints_calculator.cc"],
+    hdrs=["tensor_to_joints_calculator.h"],
+    deps=[
         ":tensor_to_joints_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework/api2:node",
@@ -1481,22 +1493,22 @@ cc_library(
         "//mediapipe/framework/port:ret_check",
         "//mediapipe/framework/port:status",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 mediapipe_proto_library(
-    name = "tensor_to_joints_calculator_proto",
-    srcs = ["tensor_to_joints_calculator.proto"],
-    deps = [
+    name="tensor_to_joints_calculator_proto",
+    srcs=["tensor_to_joints_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
     ],
 )
 
 cc_test(
-    name = "tensor_to_joints_calculator_test",
-    srcs = ["tensor_to_joints_calculator_test.cc"],
-    deps = [
+    name="tensor_to_joints_calculator_test",
+    srcs=["tensor_to_joints_calculator_test.cc"],
+    deps=[
         ":tensor_to_joints_calculator",
         ":tensor_to_joints_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
@@ -1511,18 +1523,19 @@ cc_test(
 )
 
 cc_library(
-    name = "image_to_tensor_calculator",
-    srcs = ["image_to_tensor_calculator.cc"],
-    hdrs = ["image_to_tensor_calculator.h"],
-    copts = select({
+    name="image_to_tensor_calculator",
+    srcs=["image_to_tensor_calculator.cc"],
+    hdrs=["image_to_tensor_calculator.h"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    features = ["-layering_check"],  # allow depending on image_to_tensor_calculator_gpu_deps
-    deps = [
+    # allow depending on image_to_tensor_calculator_gpu_deps
+    features=["-layering_check"],
+    deps=[
         ":image_to_tensor_calculator_cc_proto",
         ":image_to_tensor_converter",
         ":image_to_tensor_utils",
@@ -1564,13 +1577,13 @@ cc_library(
         ],
         "//conditions:default": [],
     }),
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_library(
-    name = "image_to_tensor_calculator_gpu_deps",
-    visibility = ["//visibility:private"],
-    deps = selects.with_or({
+    name="image_to_tensor_calculator_gpu_deps",
+    visibility=["//visibility:private"],
+    deps=selects.with_or({
         "//mediapipe:android": [
             ":image_to_tensor_converter_gl_buffer",
             "//mediapipe/gpu:gl_calculator_helper",
@@ -1606,9 +1619,9 @@ cc_library(
 )
 
 mediapipe_proto_library(
-    name = "image_to_tensor_calculator_proto",
-    srcs = ["image_to_tensor_calculator.proto"],
-    deps = [
+    name="image_to_tensor_calculator_proto",
+    srcs=["image_to_tensor_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
         "//mediapipe/gpu:gpu_origin_proto",
@@ -1616,9 +1629,9 @@ mediapipe_proto_library(
 )
 
 cc_test(
-    name = "image_to_tensor_calculator_test",
-    srcs = ["image_to_tensor_calculator_test.cc"],
-    data = [
+    name="image_to_tensor_calculator_test",
+    srcs=["image_to_tensor_calculator_test.cc"],
+    data=[
         "testdata/image_to_tensor/input.jpg",
         "testdata/image_to_tensor/large_sub_rect.png",
         "testdata/image_to_tensor/large_sub_rect_border_zero.png",
@@ -1634,8 +1647,8 @@ cc_test(
         "testdata/image_to_tensor/medium_sub_rect_with_rotation_border_zero.png",
         "testdata/image_to_tensor/noop_except_range.png",
     ],
-    tags = ["not_run:arm"],
-    deps = [
+    tags=["not_run:arm"],
+    deps=[
         ":image_to_tensor_calculator",
         ":image_to_tensor_calculator_cc_proto",
         ":image_to_tensor_converter",
@@ -1675,16 +1688,16 @@ cc_test(
 )
 
 cc_library(
-    name = "image_to_tensor_converter",
-    hdrs = ["image_to_tensor_converter.h"],
-    copts = select({
+    name="image_to_tensor_converter",
+    hdrs=["image_to_tensor_converter.h"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    deps = [
+    deps=[
         ":image_to_tensor_utils",
         "//mediapipe/framework/formats:image",
         "//mediapipe/framework/formats:tensor",
@@ -1693,17 +1706,17 @@ cc_library(
 )
 
 cc_library(
-    name = "image_to_tensor_converter_opencv",
-    srcs = ["image_to_tensor_converter_opencv.cc"],
-    hdrs = ["image_to_tensor_converter_opencv.h"],
-    copts = select({
+    name="image_to_tensor_converter_opencv",
+    srcs=["image_to_tensor_converter_opencv.cc"],
+    hdrs=["image_to_tensor_converter_opencv.h"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    deps = [
+    deps=[
         ":image_to_tensor_converter",
         ":image_to_tensor_utils",
         "//mediapipe/framework:calculator_framework",
@@ -1721,10 +1734,10 @@ cc_library(
 )
 
 cc_library(
-    name = "image_to_tensor_converter_frame_buffer",
-    srcs = ["image_to_tensor_converter_frame_buffer.cc"],
-    hdrs = ["image_to_tensor_converter_frame_buffer.h"],
-    deps = [
+    name="image_to_tensor_converter_frame_buffer",
+    srcs=["image_to_tensor_converter_frame_buffer.cc"],
+    hdrs=["image_to_tensor_converter_frame_buffer.h"],
+    deps=[
         ":image_to_tensor_converter",
         ":image_to_tensor_utils",
         "//mediapipe/framework:calculator_context",
@@ -1741,11 +1754,11 @@ cc_library(
 )
 
 cc_library(
-    name = "image_to_tensor_converter_gl_buffer",
-    srcs = ["image_to_tensor_converter_gl_buffer.cc"],
-    hdrs = ["image_to_tensor_converter_gl_buffer.h"],
-    visibility = ["//visibility:private"],
-    deps = ["//mediapipe/framework:port"] + selects.with_or({
+    name="image_to_tensor_converter_gl_buffer",
+    srcs=["image_to_tensor_converter_gl_buffer.cc"],
+    hdrs=["image_to_tensor_converter_gl_buffer.h"],
+    visibility=["//visibility:private"],
+    deps=["//mediapipe/framework:port"] + selects.with_or({
         "//mediapipe:emscripten": [],
         "//mediapipe:apple": [],
         "//conditions:default": [
@@ -1776,11 +1789,11 @@ cc_library(
 )
 
 cc_library(
-    name = "image_to_tensor_converter_gl_texture",
-    srcs = ["image_to_tensor_converter_gl_texture.cc"],
-    hdrs = ["image_to_tensor_converter_gl_texture.h"],
-    visibility = ["//mediapipe/gpu/webgpu:__subpackages__"],
-    deps = ["//mediapipe/framework:port"] + select({
+    name="image_to_tensor_converter_gl_texture",
+    srcs=["image_to_tensor_converter_gl_texture.cc"],
+    hdrs=["image_to_tensor_converter_gl_texture.h"],
+    visibility=["//mediapipe/gpu/webgpu:__subpackages__"],
+    deps=["//mediapipe/framework:port"] + select({
         "//mediapipe/gpu:disable_gpu": [],
         "//conditions:default": [
             ":image_to_tensor_converter",
@@ -1802,11 +1815,11 @@ cc_library(
 )
 
 cc_library(
-    name = "image_to_tensor_converter_gl_utils",
-    srcs = ["image_to_tensor_converter_gl_utils.cc"],
-    hdrs = ["image_to_tensor_converter_gl_utils.h"],
-    visibility = ["//visibility:private"],
-    deps = ["//mediapipe/framework:port"] + select({
+    name="image_to_tensor_converter_gl_utils",
+    srcs=["image_to_tensor_converter_gl_utils.cc"],
+    hdrs=["image_to_tensor_converter_gl_utils.h"],
+    visibility=["//visibility:private"],
+    deps=["//mediapipe/framework:port"] + select({
         "//mediapipe/gpu:disable_gpu": [],
         "//conditions:default": [
             "//mediapipe/framework/port:status",
@@ -1818,25 +1831,25 @@ cc_library(
 )
 
 cc_library(
-    name = "image_to_tensor_converter_metal",
-    srcs = ["image_to_tensor_converter_metal.cc"],
-    hdrs = ["image_to_tensor_converter_metal.h"],
-    copts = select({
+    name="image_to_tensor_converter_metal",
+    srcs=["image_to_tensor_converter_metal.cc"],
+    hdrs=["image_to_tensor_converter_metal.h"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    linkopts = select({
+    linkopts=select({
         "//mediapipe:apple": [
             "-framework CoreVideo",
             "-framework MetalKit",
         ],
         "//conditions:default": [],
     }),
-    visibility = ["//visibility:private"],
-    deps = ["//mediapipe/framework:port"] + select({
+    visibility=["//visibility:private"],
+    deps=["//mediapipe/framework:port"] + select({
         "//mediapipe:apple": [
             ":image_to_tensor_converter",
             ":image_to_tensor_utils",
@@ -1857,17 +1870,17 @@ cc_library(
 )
 
 cc_library(
-    name = "image_to_tensor_utils",
-    srcs = ["image_to_tensor_utils.cc"],
-    hdrs = ["image_to_tensor_utils.h"],
-    copts = select({
+    name="image_to_tensor_utils",
+    srcs=["image_to_tensor_utils.cc"],
+    hdrs=["image_to_tensor_utils.h"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    deps = [
+    deps=[
         ":image_to_tensor_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:packet",
@@ -1891,9 +1904,9 @@ cc_library(
 )
 
 cc_test(
-    name = "image_to_tensor_utils_test",
-    srcs = ["image_to_tensor_utils_test.cc"],
-    deps = [
+    name="image_to_tensor_utils_test",
+    srcs=["image_to_tensor_utils_test.cc"],
+    deps=[
         ":image_to_tensor_utils",
         "//mediapipe/framework/formats:rect_cc_proto",
         "//mediapipe/framework/port:gtest_main",
@@ -1905,16 +1918,16 @@ cc_test(
 
 # Copied from /mediapipe/calculators/tflite/BUILD
 selects.config_setting_group(
-    name = "gpu_inference_disabled",
-    match_any = [
+    name="gpu_inference_disabled",
+    match_any=[
         "//mediapipe/gpu:disable_gpu",
     ],
 )
 
 mediapipe_proto_library(
-    name = "tensors_to_segmentation_calculator_proto",
-    srcs = ["tensors_to_segmentation_calculator.proto"],
-    deps = [
+    name="tensors_to_segmentation_calculator_proto",
+    srcs=["tensors_to_segmentation_calculator.proto"],
+    deps=[
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
         "//mediapipe/gpu:gpu_origin_proto",
@@ -1922,18 +1935,19 @@ mediapipe_proto_library(
 )
 
 cc_library(
-    name = "tensors_to_segmentation_calculator",
-    srcs = ["tensors_to_segmentation_calculator.cc"],
-    hdrs = ["tensors_to_segmentation_calculator.h"],
-    copts = select({
+    name="tensors_to_segmentation_calculator",
+    srcs=["tensors_to_segmentation_calculator.cc"],
+    hdrs=["tensors_to_segmentation_calculator.h"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    features = ["-layering_check"],  # allow depending on tensors_to_segmentation_calculator_gpu_deps
-    deps = [
+    # allow depending on tensors_to_segmentation_calculator_gpu_deps
+    features=["-layering_check"],
+    deps=[
         ":tensors_to_segmentation_calculator_cc_proto",
         ":tensors_to_segmentation_converter",
         ":tensors_to_segmentation_utils",
@@ -1959,13 +1973,13 @@ cc_library(
             ":tensors_to_segmentation_converter_opencv",
         ],
     }),
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 cc_library(
-    name = "tensors_to_segmentation_calculator_gpu_deps",
-    visibility = ["//visibility:private"],
-    deps = selects.with_or({
+    name="tensors_to_segmentation_calculator_gpu_deps",
+    visibility=["//visibility:private"],
+    deps=selects.with_or({
         "//mediapipe:android": [
             ":tensors_to_segmentation_converter_gl_buffer",
             "//mediapipe/gpu:gl_calculator_helper",
@@ -1989,10 +2003,10 @@ cc_library(
 )
 
 cc_library(
-    name = "tensors_to_segmentation_utils",
-    srcs = ["tensors_to_segmentation_utils.cc"],
-    hdrs = ["tensors_to_segmentation_utils.h"],
-    deps = [
+    name="tensors_to_segmentation_utils",
+    srcs=["tensors_to_segmentation_utils.cc"],
+    hdrs=["tensors_to_segmentation_utils.h"],
+    deps=[
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:port",
         "//mediapipe/framework/port:ret_check",
@@ -2008,9 +2022,9 @@ cc_library(
 )
 
 cc_test(
-    name = "tensors_to_segmentation_utils_test",
-    srcs = ["tensors_to_segmentation_utils_test.cc"],
-    deps = [
+    name="tensors_to_segmentation_utils_test",
+    srcs=["tensors_to_segmentation_utils_test.cc"],
+    deps=[
         ":tensors_to_segmentation_utils",
         "//mediapipe/framework/port:gtest_main",
         "//mediapipe/framework/port:status_matchers",
@@ -2019,10 +2033,10 @@ cc_test(
 )
 
 cc_library(
-    name = "tensors_to_segmentation_converter",
-    hdrs = ["tensors_to_segmentation_converter.h"],
-    visibility = ["//visibility:private"],
-    deps = [
+    name="tensors_to_segmentation_converter",
+    hdrs=["tensors_to_segmentation_converter.h"],
+    visibility=["//visibility:private"],
+    deps=[
         "//mediapipe/framework/formats:image",
         "//mediapipe/framework/formats:tensor",
         "@com_google_absl//absl/status:statusor",
@@ -2030,11 +2044,11 @@ cc_library(
 )
 
 cc_library(
-    name = "tensors_to_segmentation_converter_opencv",
-    srcs = ["tensors_to_segmentation_converter_opencv.cc"],
-    hdrs = ["tensors_to_segmentation_converter_opencv.h"],
-    visibility = ["//visibility:private"],
-    deps = [
+    name="tensors_to_segmentation_converter_opencv",
+    srcs=["tensors_to_segmentation_converter_opencv.cc"],
+    hdrs=["tensors_to_segmentation_converter_opencv.h"],
+    visibility=["//visibility:private"],
+    deps=[
         ":tensors_to_segmentation_calculator_cc_proto",
         ":tensors_to_segmentation_converter",
         ":tensors_to_segmentation_utils",
@@ -2052,11 +2066,11 @@ cc_library(
 )
 
 cc_library(
-    name = "tensors_to_segmentation_converter_gl_texture",
-    srcs = ["tensors_to_segmentation_converter_gl_texture.cc"],
-    hdrs = ["tensors_to_segmentation_converter_gl_texture.h"],
-    visibility = ["//visibility:private"],
-    deps = [
+    name="tensors_to_segmentation_converter_gl_texture",
+    srcs=["tensors_to_segmentation_converter_gl_texture.cc"],
+    hdrs=["tensors_to_segmentation_converter_gl_texture.h"],
+    visibility=["//visibility:private"],
+    deps=[
         "//mediapipe/framework:port",
     ] + select({
         "//mediapipe/gpu:disable_gpu": [],
@@ -2087,11 +2101,11 @@ cc_library(
 )
 
 cc_library(
-    name = "tensors_to_segmentation_converter_gl_buffer",
-    srcs = ["tensors_to_segmentation_converter_gl_buffer.cc"],
-    hdrs = ["tensors_to_segmentation_converter_gl_buffer.h"],
-    visibility = ["//visibility:private"],
-    deps = ["//mediapipe/framework:port"] + selects.with_or({
+    name="tensors_to_segmentation_converter_gl_buffer",
+    srcs=["tensors_to_segmentation_converter_gl_buffer.cc"],
+    hdrs=["tensors_to_segmentation_converter_gl_buffer.h"],
+    visibility=["//visibility:private"],
+    deps=["//mediapipe/framework:port"] + selects.with_or({
         "//mediapipe:emscripten": [],
         "//mediapipe:apple": [],
         "//conditions:default": [
@@ -2128,18 +2142,18 @@ cc_library(
 )
 
 cc_library(
-    name = "tensors_to_segmentation_converter_metal",
-    srcs = ["tensors_to_segmentation_converter_metal.cc"],
-    hdrs = ["tensors_to_segmentation_converter_metal.h"],
-    copts = select({
+    name="tensors_to_segmentation_converter_metal",
+    srcs=["tensors_to_segmentation_converter_metal.cc"],
+    hdrs=["tensors_to_segmentation_converter_metal.h"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    visibility = ["//visibility:private"],
-    deps = [
+    visibility=["//visibility:private"],
+    deps=[
         "//mediapipe/framework:port",
     ] + selects.with_or({
         ":gpu_inference_disabled": [],
@@ -2171,9 +2185,9 @@ cc_library(
 )
 
 cc_test(
-    name = "tensors_to_segmentation_calculator_test",
-    srcs = ["tensors_to_segmentation_calculator_test.cc"],
-    deps = [
+    name="tensors_to_segmentation_calculator_test",
+    srcs=["tensors_to_segmentation_calculator_test.cc"],
+    deps=[
         ":tensors_to_segmentation_calculator",
         ":tensors_to_segmentation_calculator_cc_proto",
         ":tensors_to_segmentation_calculator_test_utils",
@@ -2195,11 +2209,11 @@ cc_test(
 )
 
 cc_library(
-    name = "tensors_to_segmentation_calculator_test_utils",
-    testonly = True,
-    srcs = ["tensors_to_segmentation_calculator_test_utils.cc"],
-    hdrs = ["tensors_to_segmentation_calculator_test_utils.h"],
-    deps = [
+    name="tensors_to_segmentation_calculator_test_utils",
+    testonly=True,
+    srcs=["tensors_to_segmentation_calculator_test_utils.cc"],
+    hdrs=["tensors_to_segmentation_calculator_test_utils.h"],
+    deps=[
         ":tensors_to_segmentation_calculator_cc_proto",
         "//mediapipe/framework:calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
@@ -2213,9 +2227,9 @@ cc_library(
 )
 
 cc_test(
-    name = "tensors_to_segmentation_calculator_test_utils_test",
-    srcs = ["tensors_to_segmentation_calculator_test_utils_test.cc"],
-    deps = [
+    name="tensors_to_segmentation_calculator_test_utils_test",
+    srcs=["tensors_to_segmentation_calculator_test_utils_test.cc"],
+    deps=[
         ":tensors_to_segmentation_calculator_cc_proto",
         ":tensors_to_segmentation_calculator_test_utils",
         "//mediapipe/framework/port:gtest_main",
@@ -2223,16 +2237,16 @@ cc_test(
 )
 
 cc_library(
-    name = "tensors_dequantization_calculator",
-    srcs = ["tensors_dequantization_calculator.cc"],
-    copts = select({
+    name="tensors_dequantization_calculator",
+    srcs=["tensors_dequantization_calculator.cc"],
+    copts=select({
         "//mediapipe:apple": [
             "-x objective-c++",
             "-fobjc-arc",  # enable reference-counting
         ],
         "//conditions:default": [],
     }),
-    deps = [
+    deps=[
         "//mediapipe/framework:calculator_context",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:memory_manager",
@@ -2244,7 +2258,7 @@ cc_library(
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/strings",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 # For a more maintainable build this target should not exist and the headers
@@ -2255,19 +2269,19 @@ cc_library(
 # Here it is used to avoid header parsing errors in packages where the feature
 # parse_headers was enabled since loose headers were not being parsed.
 cc_library(
-    name = "loose_headers",
-    tags = ["avoid_dep"],
-    textual_hdrs = [
+    name="loose_headers",
+    tags=["avoid_dep"],
+    textual_hdrs=[
         "image_to_tensor_converter_gl_buffer.h",
         "image_to_tensor_converter_gl_texture.h",
     ],
-    visibility = ["//visibility:private"],
+    visibility=["//visibility:private"],
 )
 
 cc_test(
-    name = "tensors_dequantization_calculator_test",
-    srcs = ["tensors_dequantization_calculator_test.cc"],
-    deps = [
+    name="tensors_dequantization_calculator_test",
+    srcs=["tensors_dequantization_calculator_test.cc"],
+    deps=[
         ":tensors_dequantization_calculator",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:calculator_runner",
@@ -2279,9 +2293,9 @@ cc_test(
 )
 
 cc_library(
-    name = "vector_to_tensor_calculator",
-    srcs = ["vector_to_tensor_calculator.cc"],
-    deps = [
+    name="vector_to_tensor_calculator",
+    srcs=["vector_to_tensor_calculator.cc"],
+    deps=[
         ":vector_to_tensor_calculator_cc_proto",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:memory_manager",
@@ -2296,18 +2310,18 @@ cc_library(
         "@com_google_absl//absl/log:check",
         "@com_google_absl//absl/status",
     ],
-    alwayslink = 1,
+    alwayslink=1,
 )
 
 mediapipe_proto_library(
-    name = "vector_to_tensor_calculator_proto",
-    srcs = ["vector_to_tensor_calculator.proto"],
+    name="vector_to_tensor_calculator_proto",
+    srcs=["vector_to_tensor_calculator.proto"],
 )
 
 cc_test(
-    name = "vector_to_tensor_calculator_test",
-    srcs = ["vector_to_tensor_calculator_test.cc"],
-    deps = [
+    name="vector_to_tensor_calculator_test",
+    srcs=["vector_to_tensor_calculator_test.cc"],
+    deps=[
         ":vector_to_tensor_calculator",
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework:calculator_runner",

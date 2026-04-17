@@ -1,7 +1,11 @@
+startup --output_user_root=/home/hieunc4cdc/.cache/bazel
 # The bazelrc file for MediaPipe OSS.
 
 # Tensorflow needs remote repo
 common --experimental_repo_remote_exec
+
+# Scale all repository rule timeouts by 10x (needed for LLVM overlay on slow disks)
+common --experimental_scale_timeouts=10.0
 
 # WORKSPACE support
 common --noenable_bzlmod

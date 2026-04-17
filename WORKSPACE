@@ -957,3 +957,90 @@ http_archive(
     strip_prefix = "curl-8.10.1",
     url = "https://curl.haxx.se/download/curl-8.10.1.tar.gz",
 )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+android_sdk_repository(
+    name = "androidsdk",
+    path = "/home/hieunc4cdc/Android/Sdk",
+    api_level = 36,
+    build_tools_version = "35.0.0",
+)
+
+android_ndk_repository(
+    name = "androidndk",
+    path = "/home/hieunc4cdc/Android/Sdk/ndk/27.0.12077973",
+    api_level = 24,
+)
+
+bind(name = "android/crosstool", actual = "@androidndk//:toolchain")
