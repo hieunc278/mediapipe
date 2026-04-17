@@ -29,20 +29,28 @@ jobs:
           java-version: '17'
 
       # ── 3. Maven settings.xml with GitHub Packages credentials ────────────────
+      # Use env vars so the heredoc does not mix ${{ }} expressions with bash ${}
+      # NO leading whitespace inside the heredoc — spaces corrupt XML parsing.
       - name: Write Maven settings.xml
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ACTOR: ${{ github.actor }}
         run: |
           mkdir -p ~/.m2
-          cat > ~/.m2/settings.xml <<EOF
-          <settings>
-            <servers>
-              <server>
-                <id>github</id>
-                <username>${GITHUB_ACTOR}</username>
-                <password>${{ secrets.GITHUB_TOKEN }}</password>
-              </server>
-            </servers>
-          </settings>
-          EOF
+          cat > ~/.m2/settings.xml << 'MAVEN_EOF'
+<settings>
+  <servers>
+    <server>
+      <id>github</id>
+      <username>ACTOR_PLACEHOLDER</username>
+      <password>TOKEN_PLACEHOLDER</password>
+    </server>
+  </servers>
+</settings>
+MAVEN_EOF
+          # Replace placeholders with actual values (avoids heredoc quoting issues)
+          sed -i "s|ACTOR_PLACEHOLDER|${ACTOR}|g" ~/.m2/settings.xml
+          sed -i "s|TOKEN_PLACEHOLDER|${TOKEN}|g" ~/.m2/settings.xml
 
       # ── 4. Android SDK + NDK ──────────────────────────────────────────────────
       - uses: android-actions/setup-android@v3

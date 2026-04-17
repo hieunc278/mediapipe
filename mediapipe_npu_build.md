@@ -322,3 +322,170 @@ cd /mnt/disk1/telechips/mediapipe
 # Verify
 unzip -l bazel-bin/mediapipe/tasks/java/com/google/mediapipe/tasks/core/tasks_core.aar | grep jni
 ```
+
+---
+
+## Publishing AAR Artifacts to GitHub Packages
+
+Published coordinates:
+
+| Artifact | groupId | artifactId |
+|----------|---------|------------|
+| `tasks_core.aar` | `io.github.hieunc278.mediapipe` | `tasks-core-npu` |
+| `tasks_vision.aar` | `io.github.hieunc278.mediapipe` | `tasks-vision-npu` |
+
+Repository URL: `https://maven.pkg.github.com/hieunc278/mediapipe`
+
+---
+
+### Option A — Publish from local build machine
+
+**Prerequisites:**
+
+```bash
+sudo apt install maven      # install Maven
+# Create a GitHub PAT at https://github.com/settings/tokens
+# Required scope: write:packages
+```
+
+**Run:**
+
+```bash
+export GITHUB_TOKEN=ghp_xxxxxxxxxxxx
+cd /mnt/disk1/telechips/mediapipe
+./publish_aar_to_github_packages.sh 0.10.35-ethos-n78.1
+```
+
+The script will:
+1. Write a temporary `settings.xml` with your token
+2. Call `mvn deploy:deploy-file` for each AAR
+3. Print consumer Gradle snippets on success
+
+---
+
+### Option B — GitHub Actions CI (automated)
+
+Workflow: `.github/workflows/publish-npu-aar.yml`  
+Triggers: tag push matching `npu-v*` **or** manual dispatch from Actions tab.
+
+**One-time setup — upload Arm NN binaries as a GitHub Release asset:**
+
+```bash
+cd /mnt/disk1/telechips/mediapipe/third_party/armnn/lib/arm64-v8a
+
+# Pack the real .so files (no symlinks)
+tar -czf armnn-libs-arm64-v8a.tar.gz \
+  libarmnn.so.35.0 libarmnn.so.35 \
+  libarmnnDelegate.so.29.1 libarmnnDelegate.so.29 \
+  libEthosNSupport.so libEthosNDriver.so
+
+# Create a GitHub Release tagged "armnn-libs" and upload
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY
+gh release create armnn-libs armnn-libs-arm64-v8a.tar.gz \
+  --repo hieunc278/mediapipe \
+  --title "Arm NN prebuilt libs (arm64-v8a)" \
+  --notes "Arm NN v35 + delegate v29 + Ethos-N support/driver .so files"
+```
+
+> Do this once (or when the Arm NN version changes). CI downloads this asset before every build.
+
+**Trigger a publish via tag:**
+
+```bash
+git tag npu-v0.10.35-ethos-n78.1
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY
+git push myfork npu-v0.10.35-ethos-n78.1
+```
+
+Or: `https://github.com/hieunc278/mediapipe/actions` → **Publish NPU AAR to GitHub Packages** → **Run workflow**
+
+---
+
+### Consuming the Published AARs in an Android Project
+
+**`settings.gradle`:**
+
+```groovy
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.github.com/hieunc278/mediapipe")
+            credentials {
+                username = System.getenv("GITHUB_USER") ?: project.findProperty("gpr.user")
+                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.token")
+            }
+        }
+    }
+}
+```
+
+Store credentials in `~/.gradle/gradle.properties` (never commit this file):
+
+```properties
+gpr.user=hieunc278
+gpr.token=ghp_xxxxxxxxxxxx
+```
+
+**`app/build.gradle`:**
+
+```groovy
+android {
+    defaultConfig {
+        ndk { abiFilters 'arm64-v8a' }
+    }
+}
+
+dependencies {
+    implementation 'io.github.hieunc278.mediapipe:tasks-core-npu:0.10.35-ethos-n78.1'
+    implementation 'io.github.hieunc278.mediapipe:tasks-vision-npu:0.10.35-ethos-n78.1'
+    // Required transitive deps
+    implementation 'com.google.protobuf:protobuf-javalite:3.19.4'
+    implementation 'com.google.guava:guava:31.0.1-android'
+    implementation 'androidx.annotation:annotation:1.7.0'
+}
+```
+
+---
+
+### Shipping Arm NN Runtime Libraries to Consumers
+
+The AARs do **not** bundle the Arm NN `.so` files. Consumers must ship them:
+
+**Add to `app/src/main/jniLibs/arm64-v8a/`:**
+
+```
+libarmnn.so              ← copy of libarmnn.so.35.0
+libarmnn.so.35           ← copy of libarmnn.so.35.0
+libarmnnDelegate.so      ← copy of libarmnnDelegate.so.29.1
+libarmnnDelegate.so.29   ← copy of libarmnnDelegate.so.29.1
+libEthosNSupport.so
+libEthosNDriver.so
+```
+
+Pass the runtime directory to MediaPipe:
+
+```java
+String nativeLibDir = context.getApplicationInfo().nativeLibraryDir;
+
+BaseOptions baseOptions = BaseOptions.builder()
+    .setModelAssetPath("model.tflite")
+    .setDelegate(Delegate.NPU)
+    .setDelegateOptions(new NpuOptions(nativeLibDir))
+    .build();
+```
+
+---
+
+### Version Naming Convention
+
+```
+<mediapipe-version>-ethos-n78.<patch>
+```
+
+| Version | Meaning |
+|---------|---------|
+| `0.10.35-ethos-n78.1` | First release based on MediaPipe 0.10.35 |
+| `0.10.35-ethos-n78.2` | Bug-fix, same upstream base |
+| `0.10.36-ethos-n78.1` | Rebased on MediaPipe 0.10.36 |
